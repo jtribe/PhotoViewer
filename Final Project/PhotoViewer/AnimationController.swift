@@ -1,5 +1,4 @@
 
-
 import UIKit
 
 class AnimationController: NSObject, UIViewControllerAnimatedTransitioning {
@@ -57,18 +56,19 @@ class AnimationController: NSObject, UIViewControllerAnimatedTransitioning {
         containerView.addSubview(toSnapshot)
         toSnapshot.alpha = 0
         
-        // 7: Bring the image view to the front
+        // 7: Bring the image view to the front and get the final frame
         containerView.bringSubviewToFront(imageView)
+        let toFrame = (self.toDelegate == nil) ? CGRectMake(0, 0, 0, 0) : self.toDelegate!.imageWindowFrame()
         
         // 8: Animate change
         UIView.animateWithDuration(transitionDuration(transitionContext), delay: 0, usingSpringWithDamping: 0.85, initialSpringVelocity: 0.8, options: .CurveEaseOut, animations: {
             toSnapshot.alpha = 1
-            imageView.frame = (self.toDelegate == nil) ? CGRectMake(0, 0, 0, 0) : self.toDelegate!.imageWindowFrame()
+            imageView.frame = toFrame
             
-        }, completion:{ (finished) in
+        }, completion:{ [weak self] (finished) in
 
-            self.toDelegate!.tranisitionCleanup()
-            self.fromDelegate!.tranisitionCleanup()
+            self?.toDelegate!.tranisitionCleanup()
+            self?.fromDelegate!.tranisitionCleanup()
             
             // 9: Remove transition views
             imageView.removeFromSuperview()
